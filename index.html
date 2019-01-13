@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Tree Planting Earnings Per Day</title>
+    <style>
+    	
+    </style>
+</head>
+<body>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script>
+    var data = [
+  				{"earnings": 32.2, "planted": 280}, {"earnings": 94.3, "planted": 820}, {"earnings": 148.35, "planted": 1290}, {"earnings": 157.98, "planted": 1365}, 
+  				{"earnings": 214.48, "planted": 1865}, {"earnings": 174.38, "planted": 1395}, {"earnings": 230, "planted": 2000}, {"earnings": 138.6, "planted": 990}, 
+  				{"earnings": 217.7, "planted": 1555}, {"earnings": 146.85, "planted": 1335}, {"earnings": 254.4, "planted": 2120}, {"earnings": 148.2, "planted": 1235}, 
+  				{"earnings": 145.13, "planted": 1075}, {"earnings": 253.13, "planted": 1875}, {"earnings": 210, "planted": 1680}, {"earnings": 224.1, "planted": 1660}, 
+  				{"earnings": 197.4, "planted": 1880}, {"earnings": 260.4, "planted": 2480}, {"earnings": 476.8, "planted": 4700}, {"earnings": 420, "planted": 4200}, 
+  				{"earnings": 121, "planted": 1210}, {"earnings": 322, "planted": 3220}, {"earnings": 266.2, "planted": 2420}, {"earnings": 429, "planted": 3900}, 
+  				{"earnings": 486.2, "planted": 4420}, {"earnings": 554.4, "planted": 5040}, {"earnings": 385, "planted": 3500}, {"earnings": 210, "planted": 2100}, 
+  				{"earnings": 246, "planted": 2460}, {"earnings": 147, "planted": 1470}, {"earnings": 225, "planted": 1875}, {"earnings": 247.5, "planted": 1650}, 
+  				{"earnings": 214.5, "planted": 1650}, {"earnings": 261.08, "planted": 2025}, {"earnings": 407.55, "planted": 3705}, {"earnings": 260.7, "planted": 2370}, 
+  				{"earnings": 235.28, "planted": 2100}, {"earnings": 283.5, "planted": 2025}, {"earnings": 75, "planted": 600}, {"earnings": 202.5, "planted": 1125}, 
+  				{"earnings": 237.6, "planted": 1320}, {"earnings": 237.6, "planted": 1320}, {"earnings": 240.9, "planted": 1470}, {"earnings": 129.6, "planted": 810}, 
+  				{"earnings": 148.5, "planted": 990}, {"earnings": 180, "planted": 1800}, {"earnings": 299.5, "planted": 2880}, {"earnings": 163.5, "planted": 1635}, 
+  				{"earnings": 271.05, "planted": 2235}, {"earnings": 18, "planted": 120}, {"earnings": 48, "planted": 300}, {"earnings": 277.8, "planted": 1770}, 
+  				{"earnings": 302.4, "planted": 2160}, {"earnings": 277.2, "planted": 1980}, {"earnings": 353.5, "planted": 3420}
+			]
+
+	var margin = {"left":80,
+				  "right":80,
+				  "top":80,
+				  "bottom":30};
+
+	var body = d3.select("body");
+	var width = 1000;
+	var height = 500;
+	var titleHeight = 40;
+	var isearnings = true;
+
+	var svg = body.append("svg")
+				  .attr("width", width)
+				  .attr("height", height);
+
+
+	var xScaler = d3.scaleLinear()
+    	 			.domain([0, data.length]).nice()
+    				.range([0, width - margin.right - margin.left]);
+
+    var yScaler = d3.scaleLinear()
+    	 			.domain([d3.max(data, d => d.earnings),0]).nice()
+    				.range([0, height - margin.top - margin.bottom]);
+
+    var xAxis = d3.axisBottom(xScaler);
+
+    var yAxis = d3.axisLeft(yScaler).tickFormat(d => d + "$");
+
+    var yAxisTree = d3.axisLeft(yScaler);
+
+    var lineGenerator = d3.line(data)
+    					  .x((d,i) => margin.left + xScaler(i+1))
+    					  .y(d => margin.top + yScaler(d.earnings));
+
+
+    var path = svg.append("path")
+			      .attr("d", lineGenerator(data, d=> d.earnings))
+			      .style("fill","none")
+			      .style("stroke-width","1px")
+			      .style("stroke","orange");
+
+    var pointGroup = svg.append("g")
+			        .attr("fill","#000");
+
+	pointGroup.selectAll("circle")
+	          .data(data)
+	          .enter().append("circle")
+	          .attr("cx",(d,i) => margin.left + xScaler(i+1))
+	          .attr("cy", d => margin.top + yScaler(d.earnings))
+	          .attr("r",2);
+
+    var axisGroup = svg.append("g")
+				       .attr("transform","translate("+margin.left+","+margin.top+")")
+				       .call(yAxis);
+
+    svg.append("g")
+       .attr("transform","translate("+margin.left+","+(height-margin.bottom)+")")
+       .call(xAxis);
+
+    svg.append("text")
+       .style("text-anchor","middle")
+       .attr("x",width/2)
+       .attr("y",titleHeight)
+       .text("Tree Planting Stats Per Day");
+
+
+    var plantedButton = svg.append("g")
+    				   	   .attr("transform","translate("+margin.left+","+10+")")
+    				       .style("cursor","pointer");
+    				   
+
+    var earningsButton = svg.append("g")
+    				   		.attr("transform","translate("+margin.left+","+30+")")
+    				   		.style("cursor","pointer");
+
+    var circleX = 5;
+    var circleY = 8;
+    var textX = 9 + circleX;
+    var textY = 13;
+
+    plantedButton.append("circle")
+    			 .attr("cx", circleX)
+	    	     .attr("cy", circleY)
+	    	     .attr("r",6)
+	    	     .attr("fill","#000");
+
+   	plantedButton.append("circle")
+	    		 .attr("cx", circleX)
+	    	     .attr("cy", circleY)
+	    	     .attr("r",5)
+	    	     .attr("fill","#fff");
+
+   	var innerPlanted = plantedButton.append("circle")
+		    		 				.attr("cx", circleX)
+						    	    .attr("cy", circleY)
+						    	    .attr("r",3)
+						    	    .attr("fill","#fff");
+
+   	plantedButton.append("text")
+	   			 .attr("x",textX)
+	   			 .attr("y",textY )
+	   			 .text("Trees Planted");  
+
+
+   	earningsButton.append("circle")
+	     		  .attr("cx", circleX)
+	     	      .attr("cy", circleY)
+	    	      .attr("r",6)
+	    	      .attr("fill","#000");
+
+   	earningsButton.append("circle")
+	    		  .attr("cx", circleX)
+	    	      .attr("cy", circleY)
+	    	      .attr("r",5)
+	    	      .attr("fill","#fff");
+
+   	earningsButton.append("text")
+	   			  .attr("x",textX)
+	   			  .attr("y",textY)
+	   			  .text("Money Earned");
+
+   	var innerEarnings = earningsButton.append("circle")
+		    		 				  .attr("cx", circleX)
+						    	      .attr("cy", circleY)
+						    	      .attr("r",3)
+						    	      .attr("fill","#000");
+
+
+	plantedButton.on("click",function(){
+		if(isearnings){
+		 	swapData();
+		 	innerEarnings.attr("fill", "#fff");
+			innerPlanted.attr("fill", "#000");
+		}
+	});
+
+	earningsButton.on("click",function(){
+	 	if(!isearnings){
+		 	swapData();
+		 	innerEarnings.attr("fill", "#000");
+			innerPlanted.attr("fill", "#fff");
+		}
+	})
+
+    function swapData(){
+    	yScaler.domain([d3.max(data, d => isearnings?d.planted:d.earnings),0]).nice();
+
+    	pointGroup.selectAll("circle")
+    			  .transition()
+    			  .attr("cy", d => margin.top + yScaler(isearnings?d.planted:d.earnings));
+
+    	lineGenerator.y(d => margin.top + yScaler(isearnings?d.planted:d.earnings));
+
+    	axisGroup.transition().call(isearnings?yAxisTree:yAxis);
+
+    	path.transition()
+    		.attr("d", lineGenerator(data, d=> isearnings?d.planted:d.earnings))
+    		.style("stroke",isearnings?"green":"orange");
+
+
+    	isearnings = !isearnings;
+  }
+
+	
+</script>
+
+</body>
+</html> 
